@@ -1,2 +1,2 @@
-# grokfuck
+# promptwars!
 Mistral AI Hackathon Project
