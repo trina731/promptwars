@@ -5,3 +5,4 @@ flask-security
 flask-wtf
 asyncio
 flask[async]
+python-dotenv
