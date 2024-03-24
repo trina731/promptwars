@@ -1,6 +1,6 @@
 import re
 from store import store_state
-from prompts import getResearchPrompt, get_scoring_prompt
+from prompts import PROMPT_MAP
 from flask import Flask, request, jsonify
 
 from mistral import getContextualMessages, getDefaultMessage, query_mistral
@@ -12,21 +12,21 @@ CORS(app, resources={r"/*": {"origins": "http://promptwars.com"}})
 
 storage = {}
 
-def start_process(state):
+def start_process(state, promptgen):
     for i in range(20):
-        generate_next_prompt(state)
-        generate_next_response(state)
-        score_response(state)
+        generate_next_prompt(state, promptgen)
+        generate_next_response(state, promptgen)
+        score_response(state, promptgen)
         if int(state["scores"][-1][0]) > 50:
             state['done'] = True
             store_state(state)
             break
 
-def generate_next_prompt(state):
+def generate_next_prompt(state, promptgen):
     tries = 0
     while tries < 5:
         try:
-            messages = getContextualMessages(state["prompts"], state["responses"], getResearchPrompt(state["target"]))
+            messages = getContextualMessages(state["prompts"], state["responses"], promptgen.getResearchPrompt(state["target"]), promptgen)
             response = query_mistral(messages)
             prompt_response = response.split("\n")[0].split("]: ")[1]
             state["prompts"].append(prompt_response)
@@ -34,19 +34,18 @@ def generate_next_prompt(state):
         except Exception as e:
             tries += 1
     
-def generate_next_response(state):
+def generate_next_response(state, promptgen):
     
     response = query_mistral(getDefaultMessage(state["prompts"][-1]), model="open-mistral-7b")
     state["responses"].append(response)
     
     pass
 
-def score_response(state):
-    print("SCORING")
+def score_response(state, promptgen):
     tries = 0
     while tries < 5:
         try:
-            score_prompt = get_scoring_prompt(state["responses"][-1], state["target"], state["prompts"][-1])
+            score_prompt = promptgen.get_scoring_prompt(state["responses"][-1], state["target"], state["prompts"][-1])
             score_response = query_mistral(getDefaultMessage(score_prompt))
 
             delimiters = "[SCORE]:", "[EXPLANATION]:", "\n"
@@ -77,9 +76,10 @@ def generate():
     '''
     target = request.json["target"]
     id = request.json["id"]
+    advType = request.json["advType"]
     state["target"] = target
     storage[id] = state
-    start_process(state)
+    start_process(state, PROMPT_MAP[advType])
     return ""
 
 @app.route("/get-state", methods=["POST"])

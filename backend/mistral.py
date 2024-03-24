@@ -1,7 +1,6 @@
 import os
 # from dotenv import load_dotenv
 import requests
-from prompts import get_follow_up
 from flask import jsonify
 import json
 import asyncio
@@ -9,7 +8,7 @@ import asyncio
 # MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
 MISTRAL_API_KEY = 'TWfVrlX659GSTS9hcsgUcPZ8uNzfoQsg'
 
-def getContextualMessages(prompts, responses, content):
+def getContextualMessages(prompts, responses, content, promptgen):
     messages = []
     messages.append({
             'role': 'user',
@@ -22,7 +21,7 @@ def getContextualMessages(prompts, responses, content):
             })
         messages.append({
             'role': 'user',
-            'content': get_follow_up(response)
+            'content': promptgen.get_follow_up(response)
             })
 
     print(messages)

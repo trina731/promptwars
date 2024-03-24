@@ -23,6 +23,9 @@ export default function Home() {
   const [target, setTarget] = useState(
     new URLSearchParams(window.location.search).get("target") || ""
   );
+  const [advType, setAdvType] = useState(
+    new URLSearchParams(window.location.search).get("advType") || "Problematic"
+  );
 
   const [state, setState] = useState<State>({} as State);
   const [started, setStarted] = useState(false);
@@ -41,7 +44,8 @@ export default function Home() {
 
       const payload = {
         target: target,
-        id: id
+        id: id,
+        advType: advType,
       };
       const response = await fetch("http://127.0.0.1:5000/generate", {
         method: "POST",
