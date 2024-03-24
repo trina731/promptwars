@@ -18,6 +18,8 @@ def start_process():
     for i in range(5):
         generate_next_prompt()
         generate_next_response()
+        if state["target"] in state["responses"][-1]:
+            break
 
 def generate_next_prompt():
     global state
