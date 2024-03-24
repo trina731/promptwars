@@ -31,6 +31,9 @@ def calculateMetrics():
                     metrics["num_fail"] += 1
             metrics["quality_scores"].append(state["scores"])
     print(metrics)
+    f = open("dataResults.txt", "a")
+    f.write(metrics)
+    f.close()
 
 def generate_next_prompt(state):    
     messages = getContextualMessages(state["prompts"], state["responses"], getResearchPrompt(state["target"]))
