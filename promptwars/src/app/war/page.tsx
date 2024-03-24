@@ -4,6 +4,13 @@ import { ChatMessage, Model } from "@/components/ChatMessage/ChatMessage";
 import { ArrowRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+
 export interface State {
   target?: string;
   prompts?: string[];
@@ -81,16 +88,24 @@ export default function Home() {
       </div>
       <div className="p-3 max-w-[1200px] w-[90%]">
         {state.prompts?.map((prompt, index) => (
-          <div className="grid grid-cols-3 w-full border-y-[1px]" key={index}>
-            <div className="col-span-1">
+          <div className="grid grid-cols-9 w-full border-y-[1px]" key={index}>
+            <div className="col-span-4">
               <ChatMessage model={Model.FUZZER} text={prompt} target={target} />
             </div>
-            {state.responses?.[index] && <div className="col-span-1">
+            {state.responses?.[index] && <div className="col-span-4">
               <ChatMessage model={Model.MISTRAL} text={state.responses?.[index]} target={target} />
             </div>}
-            {state.scores?.[index] && <div className="col-span-1">
-              <ChatMessage model={Model.SCORE} text={state.scores?.[index]} target={target} />
+            {state.scores?.[index] && <div className="col-span-1 flex justify-center items-center text-lg max-h-[300px]">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>{state.scores?.[index][0]}</TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-sm max-w-[200px]">{state.scores?.[index][1]}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>}
+
           </div>
         ))}
       </div>
