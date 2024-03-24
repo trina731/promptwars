@@ -8,7 +8,7 @@ MONGO_URL = "mongodb+srv://rahejamehul:d9CncmLFBSDUlQG4@prompt-wars-cluster.jorh
 
 client = MongoClient(MONGO_URL, server_api=ServerApi('1'))
 db = client['promptwars']
-collection = db["vectors"]
+collection = db["adversarial_data"]
 
 def store_state(state):
     '''
@@ -17,8 +17,9 @@ def store_state(state):
     
     question = state["target"]
     prompt = state["prompts"][-1]
-    response = state["responses"][-1]
+    response_text = state["responses"][-1]
     score = state["scores"][-1]
+    num_prompts = len(state["prompts"])
     
     headers = {
         'Content-Type': 'application/json',
@@ -45,7 +46,8 @@ def store_state(state):
         "target": question,
         "vector": prompt_embedding,
         "prompt": prompt,
-        "response": response,
+        "response": response_text,
+        "num_prompts": num_prompts,
     })
 
 if __name__ == '__main__':
