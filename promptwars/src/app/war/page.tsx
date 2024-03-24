@@ -1,9 +1,7 @@
 "use client";
 
 import { ChatMessage, Model } from "@/components/ChatMessage/ChatMessage";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export interface State {
@@ -20,11 +18,13 @@ export default function Home() {
   const [state, setState] = useState<State>({} as State);
   const [started, setStarted] = useState(false);
 
-  const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (!target || started) return;
     const start = async () => {
+      if (!target || started) return;
+      setStarted(true);
+
+
       const payload = {
         target: target,
       };
@@ -36,10 +36,8 @@ export default function Home() {
         body: JSON.stringify(payload),
       });
       const data = await response.text();
-      setMessage(data);
     };
 
-    setStarted(true);
     start();
   }, [target]);
 
@@ -65,7 +63,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="h-10 border-b-[1px] items-center px-2 flex justify-between w-full">
+      <div className="h-10 border-b-[1px] items-center px-2 flex justify-between w-full sticky top-0 bg-white z-50">
         <span className="flex flex-row items-center gap-x-3">
           <img src="/fuzzy.png" alt="fuzzy" className="bg-transparent h-4" />
           <span>PROMPT WARS</span>
@@ -81,20 +79,17 @@ export default function Home() {
           Return to home <ArrowRightIcon className="h-3" />
         </a>
       </div>
-      <div className="p-3 max-w-[800px] w-[60%] grid grid-cols-2">
-        <div className="col-span-1">
+      <div className="p-3 max-w-[1200px] w-[90%]">
         {state.prompts?.map((prompt, index) => (
-          <ChatMessage model={Model.FUZZER} text={prompt} />
+          <div className="grid grid-cols-2 w-full border-y-[1px]" key={index}>
+            <div className="col-span-1">
+              <ChatMessage model={Model.FUZZER} text={prompt} target={target}/>
+            </div>
+            {state.responses?.[index] && <div className="col-span-1">
+              <ChatMessage model={Model.MISTRAL} text={state.responses?.[index]} target={target}/>
+            </div>}
+          </div>
         ))}
-        </div>
-        
-        <div className="col-span-1">
-          {state.responses?.map((response, index) => (
-            <ChatMessage model={Model.MISTRAL} text={response} />
-          ))}
-        </div>
-        
-        <div>{message}</div>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 from prompts import getResearchPrompt
 from flask import Flask, request, jsonify
 
-from mistral import query_mistral, getContextualMessages
+from mistral import getContextualMessages, getDefaultMessage, query_mistral
 from flask_cors import CORS
 
 
@@ -27,16 +27,13 @@ def generate_next_prompt():
     messages = getContextualMessages(state["prompts"], state["responses"], getResearchPrompt(state["target"]))
     response = query_mistral(messages)
     prompt_response = response.split("\n")[0].split("]: ")[1]
-    
-    print("ADDING PROMPT: " + prompt_response)
-    
+        
     state["prompts"].append(prompt_response)
     
 def generate_next_response():
     global state
     
-    response = query_mistral(state["prompts"][-1])
-    print("ADDING RESPONSE: " + response)
+    response = query_mistral(getDefaultMessage(state["prompts"][-1]))
     state["responses"].append(response)
     
     pass
@@ -58,7 +55,7 @@ def generate():
     target = request.json["target"]
     state["target"] = target
     start_process()
-    return query_mistral("This is a test query. Can you name a French painter?")
+    return
 
 @app.route("/get-state", methods=["POST"])
 def get_state():
@@ -67,3 +64,6 @@ def get_state():
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
+
+if __name__ == '__main__':
+    app.run(debug=True)
