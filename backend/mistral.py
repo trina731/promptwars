@@ -8,21 +8,36 @@ import asyncio
 # MISTRAL_API_KEY = os.getenv('MISTRAL_API_KEY')
 MISTRAL_API_KEY = 'TWfVrlX659GSTS9hcsgUcPZ8uNzfoQsg'
 
-def query_mistral(question):
+def getContextualMessages(prompts, responses, content):
+    messages = []
+    for prompt, response in zip(prompts, responses):
+        messages.append({
+            'role': 'user',
+            'content': prompt
+            })
+        messages.append({
+            'role': 'system',
+            'content': response
+            })
+    messages.append({
+                'role': 'user',
+                'content': content
+            })
+    return messages
+
+
+def query_mistral(messages):
     headers = {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
         'Authorization': 'Bearer ' + MISTRAL_API_KEY,
     }
 
+    # we need to add role and content to messages for each one, if empty then this one
+
     json_data = {
         'model': 'mistral-large-latest',
-        'messages': [
-            {
-                'role': 'user',
-                'content': question,
-            },
-        ],
+        'messages': messages,
     }
 
     # Send Mistral query
