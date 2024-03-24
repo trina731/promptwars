@@ -1,7 +1,7 @@
 "use client";
 
 import { ChatMessage, Model } from "@/components/ChatMessage/ChatMessage";
-import { ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, LoaderIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
@@ -16,6 +16,7 @@ export interface State {
   prompts?: string[];
   responses?: string[];
   scores?: string[];
+  done?: boolean;
 }
 
 export default function Home() {
@@ -25,6 +26,7 @@ export default function Home() {
 
   const [state, setState] = useState<State>({} as State);
   const [started, setStarted] = useState(false);
+  const [id, setId] = useState("");
 
 
   useEffect(() => {
@@ -33,8 +35,13 @@ export default function Home() {
       setStarted(true);
 
 
+      const id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+
+      setId(id);
+
       const payload = {
         target: target,
+        id: id
       };
       const response = await fetch("http://127.0.0.1:5000/generate", {
         method: "POST",
@@ -50,7 +57,9 @@ export default function Home() {
 
   useEffect(() => {
     const interval = setInterval(async () => {
-      const payload = {};
+      const payload = {
+        id: id
+      };
       const response = await fetch("http://127.0.0.1:5000/get-state", {
         method: "POST",
         headers: {
@@ -77,7 +86,7 @@ export default function Home() {
         </span>
         <div className="flex flex-row justify-center items-center">
           <span>
-            <span className="italic mr-1">Generating things for</span>
+            <span className="italic mr-1">Generating prompts for</span>
             <span className="font-semibold">{target}</span>
           </span>
         </div>
@@ -87,27 +96,43 @@ export default function Home() {
         </a>
       </div>
       <div className="p-3 max-w-[1200px] w-[90%]">
+        <div className="grid grid-cols-9 w-full">
+        <>
+          <div className="col-span-4 text-center border-b border-r flex items-center justify-center">
+            <span>Muzzer</span>
+          </div>
+          <div className="col-span-4 text-center border-b border-r flex items-center justify-center">
+            <span>Mistral</span>
+          </div>
+          <div className="col-span-1 text-center border-b flex items-center justify-center">
+            <span>Score</span>
+          </div>
+        </>
         {state.prompts?.map((prompt, index) => (
-          <div className="grid grid-cols-9 w-full border-y-[1px]" key={index}>
+          <>
             <div className="col-span-4">
               <ChatMessage model={Model.FUZZER} text={prompt} target={target} />
             </div>
-            {state.responses?.[index] && <div className="col-span-4">
+            {state.responses?.[index] ? <div className="col-span-4">
               <ChatMessage model={Model.MISTRAL} text={state.responses?.[index]} target={target} />
-            </div>}
-            {state.scores?.[index] && <div className="col-span-1 flex justify-center items-center text-lg max-h-[300px]">
+            </div> : <div className="col-span-4 flex justify-center items-center text-lg max-h-[300px]"><LoaderIcon className="animate-spin h-3" /></div>}
+            {state.scores?.[index] ? <div className="col-span-1 flex justify-center items-center text-lg max-h-[300px]">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>{state.scores?.[index][0]}</TooltipTrigger>
                   <TooltipContent>
-                    <p className="text-sm max-w-[200px]">{state.scores?.[index][1]}</p>
+                    <p className="text-sm max-w-[200px]  italic font-medium">{state.scores?.[index][1]}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            </div>}
-
-          </div>
+            </div> : <div className="col-span-1 flex justify-center items-center text-lg max-h-[300px]"><LoaderIcon className="animate-spin h-3" /></div>}
+            <div className="bg-slate-400 h-px col-span-9" />
+          </>
         ))}
+        <div className="col-span-9 flex justify-center items-center h-12">
+          <LoaderIcon className="animate-spin h-5" />
+        </div>
+        </div>
       </div>
     </div>
   );
