@@ -1,7 +1,7 @@
 from prompts import getResearchPrompt, get_scoring_prompt
 from flask import Flask, request, jsonify
 
-from mistral import query_mistral
+from mistral import query_mistral, getContextualMessages
 from flask_cors import CORS
 
 
@@ -26,7 +26,8 @@ def start_process():
 def generate_next_prompt():
     global state
     
-    response = query_mistral(getResearchPrompt(state["target"]))
+    messages = getContextualMessages(state["prompts"], state["responses"], getResearchPrompt(state["target"]))
+    response = query_mistral(messages)
     prompt_response = response.split("\n")[0].split("]: ")[1]
     
     print("ADDING PROMPT: " + prompt_response)
