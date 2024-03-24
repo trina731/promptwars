@@ -11,7 +11,8 @@ CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 state = {
     'target': "",
     'prompts': [],
-    'responses': []
+    'responses': [],
+    'scores': [],
 } 
 
 def start_process():
@@ -19,8 +20,7 @@ def start_process():
         generate_next_prompt()
         generate_next_response()
         score_response()
-        if state["target"] in state["responses"][-1]:
-            print("DONE")
+        if state["target"].lower() in state["responses"][-1].lower():
             break
 
 def generate_next_prompt():
