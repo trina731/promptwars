@@ -26,6 +26,14 @@ def getContextualMessages(prompts, responses, content):
     return messages
 
 
+def getDefaultMessage(content):
+    messages = []
+    messages.append({
+                'role': 'user',
+                'content': content
+            })
+    return messages
+    
 def query_mistral(messages):
     headers = {
         'Content-Type': 'application/json',

@@ -8,19 +8,26 @@ export enum Model {
 export interface ChatMessageProps {
   model: Model;
   text: string;
+  target: string;
 }
 
-export const ChatMessage = ({ model, text }: ChatMessageProps) => {
+export const ChatMessage = ({ model, text, target }: ChatMessageProps) => {
 
+const textSplit = text.split(target);
 const avatarSrc = model === Model.MISTRAL ? "/mistral.png" : "/fuzzy.png"
   return (
-    <div className="border-y-[1px] grid grid-cols-12 py-2">
+  <div className="grid grid-cols-12 py-2">
       <Avatar className="border-[3px] col-span-1">
         <AvatarImage src={avatarSrc} />
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
       <div className="col-span-11">
-        {text}
+        {textSplit.map((chunk, index) => (
+          <>
+          {chunk}
+          {index < textSplit.length - 1 && (<b className="text-red-600 font-bold">{target}</b>)}
+          </>
+        ))}
       </div>
     </div>
   );
