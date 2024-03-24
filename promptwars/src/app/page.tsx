@@ -10,21 +10,24 @@ export default function Home() {
   const [target, setTarget] = useState("");
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24 bg-white  ">
+    <main className="flex min-h-screen flex-col items-center justify-between p-10 bg-white  ">
       <div className="justify-center items-center flex flex-col gap-y-5">
         <img src="/fuzzy.png" alt="fuzzy" className="bg-transparent" />
+        <div className="text-4xl">PROMPT WARS</div>
+        <div className="text-sm italic -mt-2">Self-improving LLM-Guided Fuzzing for LLMs</div>
         <Typewriter
           options={{
-            strings: ["PROMPT WARS"],
+            strings: ["Who was the fourth president of the United States?", "Who is the character that lives in the pineapple under the sea?", "What is the difference between memoization and memorization?"],
             autoStart: true,
-            wrapperClassName: "text-3xl font-mono",
-            cursorClassName: "text-3xl font-mono",
-            deleteSpeed: 100000000,
+            wrapperClassName: "text-lg italic text-slate-500",
+            cursorClassName: "text-lg italic text-slate-500",
+            loop: true,
+            delay: 30,
           }}
         />
         <Input
           className="bg-slate-100"
-          placeholder="Enter target"
+          placeholder="Enter question"
           value={target}
           onChange={(e) => setTarget(e.target.value)}
           onKeyDown={(e) => {

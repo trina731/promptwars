@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "http://promptwars.com"}})
 
 storage = {}
 
@@ -16,8 +16,8 @@ def start_process(state):
         generate_next_prompt(state)
         generate_next_response(state)
         score_response(state)
-        if int(state["scores"][-1][0]) > 90:
-            done = True
+        if int(state["scores"][-1][0]) > 50:
+            state['done'] = True
             break
 
 def generate_next_prompt(state):
@@ -34,7 +34,7 @@ def generate_next_prompt(state):
     
 def generate_next_response(state):
     
-    response = query_mistral(getDefaultMessage(state["prompts"][-1]))
+    response = query_mistral(getDefaultMessage(state["prompts"][-1]), model="open-mistral-7b")
     state["responses"].append(response)
     
     pass
@@ -44,7 +44,7 @@ def score_response(state):
     tries = 0
     while tries < 5:
         try:
-            score_prompt = get_scoring_prompt(state["responses"][-1])
+            score_prompt = get_scoring_prompt(state["responses"][-1], state["target"], state["prompts"][-1])
             score_response = query_mistral(getDefaultMessage(score_prompt))
 
             delimiters = "[SCORE]:", "[EXPLANATION]:", "\n"

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChatMessage, Model } from "@/components/ChatMessage/ChatMessage";
-import { ArrowRightIcon, LoaderIcon } from "lucide-react";
+import { ArrowRightIcon, LoaderIcon, ShareIcon, ThumbsUpIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
@@ -79,15 +79,15 @@ export default function Home() {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="h-10 border-b-[1px] items-center px-2 flex justify-between w-full sticky top-0 bg-white z-50">
+      <div className="h-10 border-b-[3px] items-center px-2 flex justify-between w-full sticky top-0 bg-white z-50">
         <span className="flex flex-row items-center gap-x-3">
           <img src="/fuzzy.png" alt="fuzzy" className="bg-transparent h-4" />
           <span>PROMPT WARS</span>
         </span>
         <div className="flex flex-row justify-center items-center">
           <span>
-            <span className="italic mr-1">Generating prompts for</span>
-            <span className="font-semibold">{target}</span>
+            <span className="italic mr-2">Generating prompts for:</span>
+            <span className="font-semibold">{'"'}{target}{'"'}</span>
           </span>
         </div>
 
@@ -97,7 +97,7 @@ export default function Home() {
       </div>
       <div className="p-3 max-w-[1200px] w-[90%]">
         <div className="grid grid-cols-9 w-full">
-        <>
+        <span className="grid grid-cols-9 col-span-9">
           <div className="col-span-4 text-center border-b border-r flex items-center justify-center">
             <span>Muzzer</span>
           </div>
@@ -105,9 +105,9 @@ export default function Home() {
             <span>Mistral</span>
           </div>
           <div className="col-span-1 text-center border-b flex items-center justify-center">
-            <span>Score</span>
+            <span>Confusion Score</span>
           </div>
-        </>
+        </span>
         {state.prompts?.map((prompt, index) => (
           <>
             <div className="col-span-4">
@@ -129,10 +129,15 @@ export default function Home() {
             <div className="bg-slate-400 h-px col-span-9" />
           </>
         ))}
-        <div className="col-span-9 flex justify-center items-center h-12">
+        {!state.done && <div className="col-span-9 flex justify-center items-center h-12">
           <LoaderIcon className="animate-spin h-5" />
+        </div>}
         </div>
-        </div>
+        {state.done && <div className="w-full justify-center flex my-5">
+          <ShareIcon className="h-5 cursor-pointer stroke-slate-600 hover:stroke-black" />
+          <ThumbsUpIcon className="h-5 cursor-pointer stroke-slate-600 hover:stroke-black" />
+        </div>}
+        <div className="h-screen" />
       </div>
     </div>
   );

@@ -17,12 +17,13 @@ export const ChatMessage = ({ model, text, target }: ChatMessageProps) => {
 const textSplit = text.split(target);
 const avatarSrc = model === Model.MISTRAL ? "/mistral.png" : "/fuzzy.png"
   return (
-  <div className="grid grid-cols-12 py-2">
+  <div className="grid grid-cols-12 py-2 px-2">
       <Avatar className="border-[3px] col-span-1">
         <AvatarImage src={avatarSrc} />
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
-      <div className="col-span-11 tracking-normal max-h-[400px] overflow-y-scroll whitespace-pre text-wrap">
+      <div className="col-span-1"/>
+      <div className="col-span-10 tracking-normal max-h-[400px] overflow-y-scroll whitespace-pre text-wrap">
         {textSplit.map((chunk, index) => (
           <>
           {chunk}
