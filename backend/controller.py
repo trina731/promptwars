@@ -41,11 +41,14 @@ def generate_next_response():
     pass
 
 def score_response():
+    print("SCORING")
     global state
 
-    score_response = get_scoring_prompt(state["responses"][-1])
-    print(f"RESPONSE SCORE: {score_response}")
-    return query_mistral(score_response)
+    score_prompt = get_scoring_prompt(state["responses"][-1])
+    score_response = query_mistral(getDefaultMessage(score_prompt))
+    state["scores"].append(score_response)
+
+    return score_response
 
 @app.route("/generate", methods=["POST"])
 def generate():
@@ -54,7 +57,8 @@ def generate():
     state = {
         'target': "",
         'prompts': [],
-        'responses': []
+        'responses': [],
+        'scores': []
     } 
 
     '''
@@ -63,7 +67,7 @@ def generate():
     target = request.json["target"]
     state["target"] = target
     start_process()
-    return
+    return ""
 
 @app.route("/get-state", methods=["POST"])
 def get_state():

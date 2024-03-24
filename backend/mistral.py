@@ -48,8 +48,12 @@ def query_mistral(messages):
         'messages': messages,
     }
 
+    print("messages: ", messages)
+
     # Send Mistral query
     response = requests.post('https://api.mistral.ai/v1/chat/completions', headers=headers, json=json_data)
+
+    print("original response: ", json.loads(response.text))
 
     mistral_response = json.loads(response.text)["choices"]
 

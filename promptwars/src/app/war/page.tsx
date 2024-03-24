@@ -8,6 +8,7 @@ export interface State {
   target?: string;
   prompts?: string[];
   responses?: string[];
+  scores?: string[];
 }
 
 export default function Home() {
@@ -35,7 +36,6 @@ export default function Home() {
         },
         body: JSON.stringify(payload),
       });
-      const data = await response.text();
     };
 
     start();
@@ -81,12 +81,15 @@ export default function Home() {
       </div>
       <div className="p-3 max-w-[1200px] w-[90%]">
         {state.prompts?.map((prompt, index) => (
-          <div className="grid grid-cols-2 w-full border-y-[1px]" key={index}>
+          <div className="grid grid-cols-3 w-full border-y-[1px]" key={index}>
             <div className="col-span-1">
-              <ChatMessage model={Model.FUZZER} text={prompt} target={target}/>
+              <ChatMessage model={Model.FUZZER} text={prompt} target={target} />
             </div>
             {state.responses?.[index] && <div className="col-span-1">
-              <ChatMessage model={Model.MISTRAL} text={state.responses?.[index]} target={target}/>
+              <ChatMessage model={Model.MISTRAL} text={state.responses?.[index]} target={target} />
+            </div>}
+            {state.scores?.[index] && <div className="col-span-1">
+              <ChatMessage model={Model.SCORE} text={state.scores?.[index]} target={target} />
             </div>}
           </div>
         ))}

@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 export enum Model {
     FUZZER = "fuzzer",
     MISTRAL = "mistral", 
+    SCORE = "score"
 }
 
 export interface ChatMessageProps {
