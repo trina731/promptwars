@@ -1,3 +1,4 @@
+import re
 from prompts import getResearchPrompt, get_scoring_prompt
 from flask import Flask, request, jsonify
 
@@ -46,7 +47,12 @@ def score_response():
 
     score_prompt = get_scoring_prompt(state["responses"][-1])
     score_response = query_mistral(getDefaultMessage(score_prompt))
-    state["scores"].append(score_response)
+
+    delimiters = "[SCORE]:", "[EXPLANATION]:", "\n"
+    regex_pattern = '|'.join(map(re.escape, delimiters))
+    score_response_parsed = list(filter(None, re.split(regex_pattern, score_response)))
+    
+    state["scores"].append((score_response_parsed[0].strip(), score_response_parsed[1].strip()))
 
     return score_response
 
