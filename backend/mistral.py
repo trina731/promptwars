@@ -35,4 +35,4 @@ def query_mistral(question):
     else:
         print(f"Received Mistral API response: {mistral_response}.")
 
-    return mistral_response[0]["message"]
+    return mistral_response[0]["message"].get("content")

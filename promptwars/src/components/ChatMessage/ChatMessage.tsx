@@ -7,9 +7,10 @@ export enum Model {
 
 export interface ChatMessageProps {
   model: Model;
+  text: string;
 }
 
-export const ChatMessage = ({ model }: ChatMessageProps) => {
+export const ChatMessage = ({ model, text }: ChatMessageProps) => {
 
 const avatarSrc = model === Model.MISTRAL ? "/mistral.png" : "/fuzzy.png"
   return (
@@ -19,7 +20,7 @@ const avatarSrc = model === Model.MISTRAL ? "/mistral.png" : "/fuzzy.png"
         <AvatarFallback>CN</AvatarFallback>
       </Avatar>
       <div className="col-span-11">
-        Here is the message from {model===Model.MISTRAL ? "MISTRAL" : "FUZZER"}
+        {text}
       </div>
     </div>
   );

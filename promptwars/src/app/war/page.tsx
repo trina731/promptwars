@@ -5,31 +5,61 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+
+export interface State {
+  target?: string;
+  prompts?: string[];
+  responses?: string[];
+}
+
 export default function Home() {
   const [target, setTarget] = useState(
     new URLSearchParams(window.location.search).get("target") || ""
   );
 
+  const [state, setState] = useState<State>({} as State);
+  const [started, setStarted] = useState(false);
+
   const [message, setMessage] = useState("");
 
   useEffect(() => {
+    if (!target || started) return;
     const start = async () => {
-       const payload = {};
-        const response = await fetch("http://127.0.0.1:5000/generate", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(payload),
-        });
+      const payload = {
+        target: target,
+      };
+      const response = await fetch("http://127.0.0.1:5000/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
       const data = await response.text();
       setMessage(data);
-    }
+    };
 
+    setStarted(true);
     start();
-
-
   }, [target]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const payload = {};
+      const response = await fetch("http://127.0.0.1:5000/get-state", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      console.log(data);
+      setState(data);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  });
 
   const [model, setModel] = useState<Model>();
 
@@ -41,16 +71,29 @@ export default function Home() {
           <span>PROMPT WARS</span>
         </span>
         <div className="flex flex-row justify-center items-center">
-          <span><span className="italic mr-1">Generating things for</span><span className="font-semibold">{target}</span></span>
+          <span>
+            <span className="italic mr-1">Generating things for</span>
+            <span className="font-semibold">{target}</span>
+          </span>
         </div>
 
         <a className="flex flex-row items-center cursor-pointer" href="/">
           Return to home <ArrowRightIcon className="h-3" />
         </a>
       </div>
-      <div className="p-3 max-w-[800px] w-[60%]">
-        <ChatMessage model={Model.FUZZER} />
-        <ChatMessage model={Model.MISTRAL} />
+      <div className="p-3 max-w-[800px] w-[60%] grid grid-cols-2">
+        <div className="col-span-1">
+        {state.prompts?.map((prompt, index) => (
+          <ChatMessage model={Model.FUZZER} text={prompt} />
+        ))}
+        </div>
+        
+        <div className="col-span-1">
+          {state.responses?.map((response, index) => (
+            <ChatMessage model={Model.MISTRAL} text={response} />
+          ))}
+        </div>
+        
         <div>{message}</div>
       </div>
     </div>
