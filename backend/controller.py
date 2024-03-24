@@ -1,4 +1,4 @@
-from prompts import getResearchPrompt
+from prompts import getResearchPrompt, get_scoring_prompt
 from flask import Flask, request, jsonify
 
 from mistral import query_mistral
@@ -18,7 +18,9 @@ def start_process():
     for i in range(5):
         generate_next_prompt()
         generate_next_response()
+        score_response()
         if state["target"] in state["responses"][-1]:
+            print("DONE")
             break
 
 def generate_next_prompt():
@@ -40,6 +42,12 @@ def generate_next_response():
     
     pass
 
+def score_response():
+    global state
+
+    score_response = get_scoring_prompt(state["responses"][-1])
+    print(f"RESPONSE SCORE: {score_response}")
+    return query_mistral(score_response)
 
 @app.route("/generate", methods=["POST"])
 def generate():
@@ -57,7 +65,7 @@ def generate():
     target = request.json["target"]
     state["target"] = target
     start_process()
-    return query_mistral("This is a test query. Can you name a French painter?")
+    return
 
 @app.route("/get-state", methods=["POST"])
 def get_state():
