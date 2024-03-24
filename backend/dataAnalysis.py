@@ -1,6 +1,7 @@
 from prompts import getResearchPrompt, get_scoring_prompt
 from mistral import getContextualMessages, getDefaultMessage, query_mistral
 from tqdm import tqdm
+import re
 
 def calculateMetrics():
     metrics = {
@@ -12,14 +13,14 @@ def calculateMetrics():
     }
 
     for j in range(len(metrics["targets"])):
-        for i in tqdm(range(10)):
+        for i in tqdm(range(3)):
             state = {
                 'target': metrics["targets"][j],
                 'prompts': [],
                 'responses': [],
                 'scores': []
                 } 
-            for i in range(10):
+            for i in range(2):
                 generate_next_prompt(state)
                 generate_next_response(state)
                 metrics["iterations"].append(i+1)
@@ -32,7 +33,7 @@ def calculateMetrics():
             metrics["quality_scores"].append(state["scores"])
     print(metrics)
     f = open("dataResults.txt", "a")
-    f.write(metrics)
+    f.write(str(metrics))
     f.close()
 
 def generate_next_prompt(state):    
@@ -49,6 +50,11 @@ def generate_next_response(state):
 def score_response(state):
     score_prompt = get_scoring_prompt(state["responses"][-1])
     score_response = query_mistral(getDefaultMessage(score_prompt))
-    state["scores"].append(score_response)
+  
+    delimiters = "[SCORE]:", "[EXPLANATION]:", "\n"
+    regex_pattern = '|'.join(map(re.escape, delimiters))
+    score_response_parsed = list(filter(None, re.split(regex_pattern, score_response)))
+    
+    state["scores"].append(score_response_parsed[0].strip())
 
 calculateMetrics()
