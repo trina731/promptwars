@@ -1,4 +1,5 @@
 import re
+from store import store_state
 from prompts import getResearchPrompt, get_scoring_prompt
 from flask import Flask, request, jsonify
 
@@ -18,6 +19,7 @@ def start_process(state):
         score_response(state)
         if int(state["scores"][-1][0]) > 50:
             state['done'] = True
+            store_state(state)
             break
 
 def generate_next_prompt(state):
