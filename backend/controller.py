@@ -18,7 +18,7 @@ def start_process():
     for i in range(5):
         generate_next_prompt()
         generate_next_response()
-        if state["target"] in state["responses"][-1]:
+        if state["target"].lower() in state["responses"][-1].lower():
             break
 
 def generate_next_prompt():
